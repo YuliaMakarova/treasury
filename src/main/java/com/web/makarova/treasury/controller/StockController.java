@@ -28,5 +28,6 @@ public class StockController {
             return "Failed to retrieve stock price for " + ticker;
         }
     }
+    //http://localhost:8888/stocks/IBM/USD
 }
 

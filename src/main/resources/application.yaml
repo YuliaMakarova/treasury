@@ -1,3 +1,6 @@
+server:
+  port: 8888
+
 spring:
   jpa:
     database: POSTGRESQL
@@ -23,6 +26,8 @@ feign:
   url:
     alpha: https://www.alphavantage.co
     rates: https://openexchangerates.org
+    local: http://localhost:8080
+  path: api/asset
 
 stock:
   apiKey: 7K787PFK934JZ63F

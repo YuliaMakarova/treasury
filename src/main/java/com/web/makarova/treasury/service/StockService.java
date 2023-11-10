@@ -11,14 +11,14 @@ import java.util.Map;
 
 @Service
 public class StockService {
-    @Value("7K787PFK934JZ63F")
+    @Value("${stock.apiKey}")
     private String apiKey;
-    @Value("GLOBAL_QUOTE")
+    @Value("${stock.function}")
     private String function;
 
-    @Value("17bdd6eccfa44586a9ef23c296e5b0de")
+    @Value("${stock.appId}")
     private String appId;
-    @Value("USD")
+    @Value("${stock.base}")
     private String base;
 
     private final AlphaVantageClient alphaVantageClient;

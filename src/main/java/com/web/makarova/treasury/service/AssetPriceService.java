@@ -35,5 +35,6 @@ public class AssetPriceService {
         return assetResponses.stream()
                 .map(asset -> stockService.getStockPrice(asset.getTicker(), asset.getCurrency()))
                 .toList();
+        //kafka
     }
 }

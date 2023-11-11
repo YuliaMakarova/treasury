@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  app:
+    image: 'teasury:latest'
+    build:
+      context: .
+    container_name: treasury
+    depends_on:
+      - db
+    networks:
+      - my-network
+
+  db:
+    image: 'postgres:latest'
+    container_name: db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+    networks:
+      - my-network
+
+networks:
+  my-network:

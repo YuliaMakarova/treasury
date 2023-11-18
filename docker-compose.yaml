@@ -8,8 +8,8 @@ services:
     container_name: treasury
     depends_on:
       - db
-    networks:
-      - my-network
+    ports:
+      - "8888:8888"
 
   db:
     image: 'postgres:latest'
@@ -17,10 +17,6 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123
-    networks:
-      - my-network
-
-networks:
-  my-network:
+      - POSTGRES_USER =postgres
+      - POSTGRES_PASSWORD =123
+      - POSTGRES_DB ="asset"

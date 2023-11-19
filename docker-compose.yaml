@@ -8,12 +8,27 @@ services:
     container_name: treasury
     depends_on:
       - db
+      - kafka
     ports:
       - "8888:8888"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/asset
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 123
+      KAFKA_SERVER: kafka:9092
+
+  test:
+    image: 'test:latest'
+    build:
+      context: D:/Java/web/demo/
+    depends_on:
+      - db
+      - kafka
+    ports:
+      - "5555:5555"
+    environment:
+      KAFKA_SERVER: kafka:9092
+
   db:
     image: 'postgres:latest'
     container_name: db
@@ -21,6 +36,29 @@ services:
     ports:
       - "5432:5432"
     environment:
+      POSTGRES_DB: asset
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
-      POSTGRES_DB: asset
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "events.treasury.upload:1:1"

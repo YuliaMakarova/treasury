@@ -1,12 +1,31 @@
 server:
   port: 8888
 
+treasury:
+  kafka:
+    consumer-enabled: true
+
 spring:
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: 1
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      max-poll-records: 1
+      fetch-max-wait: 36000
+      enable-auto-commit: false
+      client-id: 1
+    producer:
+      client-id: 1
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 2
   jpa:
     database: POSTGRESQL
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   datasource:
     url: jdbc:postgresql://db:5432/asset
     username: postgres
@@ -22,6 +41,7 @@ spring:
             readTimeout: 30000
             loggerLevel: FULL
 
+
 feign:
   url:
     alpha: https://www.alphavantage.co
@@ -34,3 +54,4 @@ stock:
   function: GLOBAL_QUOTE
   appId: 17bdd6eccfa44586a9ef23c296e5b0de
   base: USD
+

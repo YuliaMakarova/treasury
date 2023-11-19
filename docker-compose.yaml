@@ -10,13 +10,17 @@ services:
       - db
     ports:
       - "8888:8888"
-
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/asset
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123
   db:
     image: 'postgres:latest'
     container_name: db
+    restart: always
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER =postgres
-      - POSTGRES_PASSWORD =123
-      - POSTGRES_DB ="asset"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: asset

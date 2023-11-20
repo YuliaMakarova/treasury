@@ -3,6 +3,7 @@ package com.web.makarova.treasury.feign.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Getter
@@ -12,5 +13,5 @@ public class ExchangeRatesResponse {
     private String license;
     private long timestamp;
     private String base;
-    private Map<String, Double> rates;
+    private Map<String, BigDecimal> rates;
 }

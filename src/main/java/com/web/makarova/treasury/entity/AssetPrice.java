@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name="assetprice")
+// Наименование в SQL через разделитель
+@Table(name="asset_price")
 public class AssetPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +21,7 @@ public class AssetPrice {
     @Column
     private String currency;
     @Column
-    private Double price;
+    private BigDecimal price;
     @Column
     private LocalDateTime timestamp;
 }

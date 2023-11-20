@@ -6,32 +6,6 @@ treasury:
     consumer-enabled: true
 
 spring:
-  kafka:
-    consumer:
-      auto-offset-reset: earliest
-      group-id: 1
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      max-poll-records: 1
-      fetch-max-wait: 36000
-      enable-auto-commit: false
-      client-id: 1
-    producer:
-      client-id: 1
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      retries: 2
-  jpa:
-    database: POSTGRESQL
-    show-sql: true
-    hibernate:
-      ddl-auto: create
-  datasource:
-    url: jdbc:postgresql://db:5432/asset
-    username: postgres
-    password: 123
-    driver-class-name: org.postgresql.Driver
-    platform: postgres
   cloud:
     openfeign:
       client:
@@ -40,6 +14,54 @@ spring:
             connectTimeout: 30000
             readTimeout: 30000
             loggerLevel: FULL
+    stream:
+      function:
+        definition: kafkaConsumer;
+      bindings:
+        kafkaProducer-out-0:
+          destination: out
+          binder: kafka
+        #В качестве примера
+        kafkaConsumer-in-0:
+          destination: in
+          binder: kafka
+          consumer:
+            backOffInitialInterval: 60000
+            backOffMaxInterval: 3840000
+            max-attempts: 8
+      binders:
+        kafka:
+          type: kafka
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: kafka
+                      defaultBrokerPort: 9092
+                      minPartitionCount: 3
+                      configuration:
+                        security:
+                          protocol: PLAINTEXT
+                        sasl:
+                          mechanism: PLAIN
+                      jaas:
+                        loginModule: org.apache.kafka.common.security.plain.PlainLoginModule
+                        options:
+                          username: test
+                          password: test
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:postgresql://db:5432/asset
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+    platform: postgres
 
 
 feign:

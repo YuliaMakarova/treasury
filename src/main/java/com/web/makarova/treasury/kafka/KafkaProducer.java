@@ -1,16 +1,19 @@
 package com.web.makarova.treasury.kafka;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class KafkaProducer {
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private final StreamBridge streamBridge;
 
     public void sendMessage(String topic, String message) {
-        kafkaTemplate.send(topic, message);
+        log.info("Sending message to topic {}, body: {}", topic, message);
+        streamBridge.send(topic, message);
     }
 }

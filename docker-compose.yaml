@@ -17,17 +17,17 @@ services:
       SPRING_DATASOURCE_PASSWORD: 123
       KAFKA_SERVER: kafka:9092
 
-  test:
-    image: 'test:latest'
-    build:
-      context: D:/Java/web/demo/
-    depends_on:
-      - db
-      - kafka
-    ports:
-      - "5555:5555"
-    environment:
-      KAFKA_SERVER: kafka:9092
+#  test:
+#    image: 'test:latest'
+#    build:
+#      context: D:/Java/web/demo/
+#    depends_on:
+#      - db
+#      - kafka
+#    ports:
+#      - "5555:5555"
+#    environment:
+#      KAFKA_SERVER: kafka:9092
 
   db:
     image: 'postgres:latest'

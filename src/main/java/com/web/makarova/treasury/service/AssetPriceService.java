@@ -5,13 +5,16 @@ import com.web.makarova.treasury.feign.RequestRatesClient;
 import com.web.makarova.treasury.feign.dto.AssetResponse;
 import com.web.makarova.treasury.repository.AssetPriceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AssetPriceService {
     private final AssetPriceRepository assetPriceRepository;
@@ -19,7 +22,8 @@ public class AssetPriceService {
     private final StockService stockService;
 
 
-    public void saveAssetPrice(String bloombergTicker, String currency, Double price) {
+    public void save(String bloombergTicker, String currency, BigDecimal price) {
+        // Мб mapstruct заюзать?
         AssetPrice assetPrice = new AssetPrice();
         assetPrice.setBloombergTicker(bloombergTicker);
         assetPrice.setCurrency(currency);
@@ -29,12 +33,22 @@ public class AssetPriceService {
     }
 
     @Scheduled(cron = "0 0 12 * * ?")
-    //@Scheduled(fixedRate = 9000)
-    public List<Double> checkAssetFromCore() {
+    public void checkAssetFromCore() {
         List<AssetResponse> assetResponses = requestRatesClient.getAllAsset();
-        return assetResponses.stream()
-                .map(asset -> stockService.getStockPrice(asset.getTicker(), asset.getCurrency()))
-                .toList();
+//        List<AssetResponse> assetResponses = List.of(new AssetResponse()
+//            .setCurrency("RUB")
+//            .setTicker("BABA"));
+        assetResponses
+            .forEach(asset -> {
+                // Представьте, что у вас 10000 активов и по одному из них проходит сбой
+                // стоит один актив того, что операция не выполнится целиком?
+                try {
+                    stockService.getStockPrice(asset.getTicker(), asset.getCurrency());
+                    //Грех, но пустым оставлять еще больший грех
+                } catch (Exception e) {
+                    log.warn(e.getMessage());
+                }
+            });
         //kafka
     }
 }

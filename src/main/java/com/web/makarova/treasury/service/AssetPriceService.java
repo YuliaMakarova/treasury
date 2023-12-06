@@ -43,7 +43,7 @@ public class AssetPriceService {
                 // Представьте, что у вас 10000 активов и по одному из них проходит сбой
                 // стоит один актив того, что операция не выполнится целиком?
                 try {
-                    stockService.getStockPrice(asset.getTicker(), asset.getCurrency());
+                    stockService.getStockPrice(asset.getBloombergTicker(), asset.getCurrency().getName());
                     //Грех, но пустым оставлять еще больший грех
                 } catch (Exception e) {
                     log.warn(e.getMessage());

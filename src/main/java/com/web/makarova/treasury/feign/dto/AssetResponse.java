@@ -8,8 +8,26 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 public class AssetResponse {
-    // Зачем с заглавных?
-    private String Stock;
-    private String Currency;
-    private String Ticker;
+    private Long id;
+    private Exchange exchange;
+    private Currency currency;
+    private String isin;
+    private String bloombergTicker;
+    private String name;
+
+    @Getter
+    @Setter
+    public static class Currency {
+        private Long id;
+        private String code;
+        private String name;
+    }
+
+    @Getter
+    @Setter
+    public static class Exchange {
+        private Long id;
+        private String name;
+        private String code;
+    }
 }

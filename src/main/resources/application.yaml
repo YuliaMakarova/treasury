@@ -61,8 +61,6 @@ spring:
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
-    platform: postgres
-
 
 feign:
   url:

@@ -1,26 +1,51 @@
 package com.web.makarova.treasury.service;
 
 import com.web.makarova.treasury.entity.AssetPrice;
-import com.web.makarova.treasury.feign.RequestRatesClient;
-import com.web.makarova.treasury.feign.dto.AssetResponse;
+import com.web.makarova.treasury.repository.AssetPricePagingAndSortingRepository;
 import com.web.makarova.treasury.repository.AssetPriceRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class AssetPriceService {
     private final AssetPriceRepository assetPriceRepository;
-    private final RequestRatesClient requestRatesClient;
-    private final StockService stockService;
+    private final AssetPricePagingAndSortingRepository assetPricePagingAndSortingRepository;
 
+    public Page<AssetPrice> getAssetPrice(int page, String sortBy, String sortOrder, String field, String value) {
+        Pageable pageable;
+        int size = 10;
+        if (sortBy != null) {
+            pageable = sortOrder != null && sortOrder.equalsIgnoreCase("desc") ?
+                    PageRequest.of(page, size, Sort.by(sortBy).descending()) :
+                    PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
+        if (field != null) {
+            BigDecimal bigDecimalValue = null;
+            if (field.equals("price"))
+                bigDecimalValue = new BigDecimal(value);
+            return switch (field.toLowerCase()) {
+                case "bloombergticker" -> assetPricePagingAndSortingRepository.
+                        findByBloombergTickerContainingIgnoreCase(value, PageRequest.of(page, size));
+                case "currency" -> assetPricePagingAndSortingRepository.findByCurrencyContainingIgnoreCase(value,
+                        PageRequest.of(page, size));
+                case "price" -> assetPricePagingAndSortingRepository.findByPriceContainingIgnoreCase(bigDecimalValue,
+                        PageRequest.of(page, size));
+                default -> assetPricePagingAndSortingRepository.findAll(PageRequest.of(page, size));
+            };
+        } else {
+            return assetPricePagingAndSortingRepository.findAll(pageable);
+        }
+    }
 
     public void save(String bloombergTicker, String currency, BigDecimal price) {
         // Мб mapstruct заюзать?
@@ -30,25 +55,5 @@ public class AssetPriceService {
         assetPrice.setPrice(price);
         assetPrice.setTimestamp(LocalDateTime.now());
         assetPriceRepository.save(assetPrice);
-    }
-
-    @Scheduled(cron = "0 0 12 * * ?")
-    public void checkAssetFromCore() {
-        List<AssetResponse> assetResponses = requestRatesClient.getAllAsset();
-//        List<AssetResponse> assetResponses = List.of(new AssetResponse()
-//            .setCurrency("RUB")
-//            .setTicker("BABA"));
-        assetResponses
-            .forEach(asset -> {
-                // Представьте, что у вас 10000 активов и по одному из них проходит сбой
-                // стоит один актив того, что операция не выполнится целиком?
-                try {
-                    stockService.getStockPrice(asset.getBloombergTicker(), asset.getCurrency().getName());
-                    //Грех, но пустым оставлять еще больший грех
-                } catch (Exception e) {
-                    log.warn(e.getMessage());
-                }
-            });
-        //kafka
     }
 }
